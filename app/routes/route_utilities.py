@@ -1,7 +1,32 @@
-from flask import abort, make_response
+from flask import abort, make_response, Response
 from ..db import db
-# utilities to write
-# create model
+
+def get_models_with_filters(cls, filters=None):
+    query = db.select(cls)
+    if filters:
+        for attribute, value in filters.items():
+            if hasattr(cls, attribute):
+                query = query.where(getattr(cls, attribute).ilike(f"%{value}%"))
+
+    models = db.session.scalars(query.order_by(cls.id))
+
+    return [model.to_dict() for model in models]
+
+
+def validate_model(cls, id):
+    try:
+        int(id)
+    except:
+        response = {"message": f"{cls.__name__} {id} invalid"}
+        abort(make_response(response, 400))
+
+    query = db.select(cls).where(cls.id == id)
+    model = db.session.scalar(query)
+    if not model:
+        response = {"message": f"{cls.__name__} {id} not found"}
+        abort(make_response(response, 404))
+    
+    return model
 
 def create_model(cls, model_data):
     try:
@@ -15,6 +40,22 @@ def create_model(cls, model_data):
 
     return new_model.to_dict(), 201
 
-# delete model
+def delete_model(cls, id):
+    model = validate_model(cls, id)
+
+    db.session.delete(model)
+    db.session.commit()
+
+    return Response(status=204, mimetype="application/json")
+
 # update model
-# validate model
+def update_model(cls, id, request_body, allowed_params):
+    model = validate_model(cls, id)
+
+    for param, value in request_body.items():
+        if hasattr(cls, param) and param in allowed_params:
+            setattr(model, param, value)
+
+    db.session.commit()
+
+    return Response(status=204, mimetype="application/json")

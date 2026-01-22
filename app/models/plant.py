@@ -2,6 +2,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy import ForeignKey
 from typing import Optional
 from datetime import datetime
+from flask import abort, make_response
 from ..db import db
 
 class Plant(db.Model):
@@ -18,8 +19,25 @@ class Plant(db.Model):
     moisture_history: Mapped[list["MoistureLog"]] = relationship(back_populates="plant")
 
     def to_dict(self):
+
         return {
             "id": self.id,
             "name": self.name,
-            "owner_id": self.owner_id
-        }
+            "description": self.description,
+            "photo": self.photo,
+            "current_moisture_level": self.current_moisture_level,
+            "desired_moisture_level": self.desired_moisture_level,
+            "next_water_date": self.next_water_date
+            }
+    
+
+    @classmethod
+    def from_dict(cls, plant_data, owner_id):
+        required_params = ["name", "owner_id", "desired_moisture_level"]
+        optional_params = [
+            "description",
+            "photo",
+            "current_moisture_level"
+            ]
+        kwarg_dict = {param: plant_data[param] for param in required_params}
+        return cls(**kwarg_dict)

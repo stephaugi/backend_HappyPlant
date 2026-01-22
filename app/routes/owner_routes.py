@@ -1,11 +1,10 @@
 from flask import Blueprint, request, Response
 from ..db import db
 from app.models.owner import Owner
-from .route_utilities import create_model
+from app.models.plant import Plant
+from .route_utilities import get_models_with_filters, create_model, validate_model
 
 bp = Blueprint("owners_bp", __name__, url_prefix="/owners")
-# REQUIRED_PARAMS = ["name", "desired_moisture_level", "user_id"]
-# OPTIONAL_PARAMS = ["description", "photo", "current_moisture_level", "next_water_date"]
 
 @bp.post("")
 def create_owner():
@@ -15,7 +14,24 @@ def create_owner():
 
 @bp.get("")
 def get_all_owners():
-    query = db.select(Owner)
+    params = request.args
 
-    owners = db.session.scalars(query)
-    return [owner.to_dict() for owner in owners]
+    return get_models_with_filters(Owner, params)
+
+@bp.get("<owner_id>")
+def get_one_owner(owner_id):
+    owner = validate_model(Owner, owner_id)
+    
+    return owner.to_dict()
+
+@bp.post("/<owner_id>/plants")
+def create_plant(owner_id):
+    request_body = request.get_json()
+    request_body["owner_id"] = owner_id
+    return create_model(Plant, request_body)
+
+@bp.get("/<owner_id>/plants")
+def get_plants(owner_id):
+    owner = validate_model(Owner, owner_id)
+    
+    return [plant.to_dict() for plant in owner.plants]
