@@ -1,8 +1,8 @@
-from flask import Blueprint, request, Response
+from flask import Blueprint, request, Response, abort, make_response
 from ..db import db
 from app.models.owner import Owner
 from app.models.plant import Plant
-from .route_utilities import get_models_with_filters, create_model, validate_model
+from .route_utilities import get_models_with_filters, create_model, validate_model, delete_model, update_model
 
 bp = Blueprint("owners_bp", __name__, url_prefix="/owners")
 
@@ -24,6 +24,29 @@ def get_one_owner(owner_id):
     
     return owner.to_dict()
 
+@bp.delete("/<owner_id>")
+def delete_owner(owner_id):
+    # delete all plants from owner
+    # owner = validate_model(Owner, owner_id)
+    # for plant in owner.plants:
+    #     db.session.delete(plant)
+    # db.session.commit()
+
+    # delete owner model
+    return delete_model(Owner, owner_id)
+
+@bp.patch("/<owner_id>")
+def update_owner(owner_id):
+    allowed_params = ["first_name", "last_name", "email"]
+    try:
+        request_body = request.get_json()
+        return update_model(Owner, owner_id, request_body, allowed_params)
+    except:
+        valid_attrs = ", ".join(allowed_params)
+        response_body = {"message":
+            f"Valid request body must be included. Valid attrs: {valid_attrs}."}
+        abort(make_response(response_body, 400))
+
 @bp.post("/<owner_id>/plants")
 def create_plant(owner_id):
     request_body = request.get_json()
@@ -35,3 +58,4 @@ def get_plants(owner_id):
     owner = validate_model(Owner, owner_id)
     
     return [plant.to_dict() for plant in owner.plants]
+

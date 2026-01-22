@@ -5,9 +5,21 @@ from app.models.water_log import WaterLog
 from app.models.moisture_log import MoistureLog
 from app.models.plant_status import PlantStatus
 import datetime
-from .route_utilities import create_model, validate_model, update_model, delete_model
+from .route_utilities import create_model, validate_model, update_model, delete_model, get_models_with_filters
 
 bp = Blueprint("plants_bp", __name__, url_prefix="/plants")
+
+@bp.get("")
+def get_all_plants():
+    params = request.args
+
+    return get_models_with_filters(Plant, params)
+
+@bp.get("/<plant_id>")
+def get_one_plant(plant_id):
+    plant = validate_model(Plant, plant_id)
+    
+    return plant.to_dict()
 
 @bp.put("/<plant_id>")
 def edit_plant(plant_id):

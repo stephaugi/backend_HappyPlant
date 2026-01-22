@@ -158,8 +158,52 @@ def test_get_plants(client, one_owner, two_plants):
 
 
 # @pytest.mark.skip
-
-
 # test owner gets deleted
+def test_delete_owner(client, one_owner, one_plant):
+    # Act
+    response = client.delete("/owners/1")
+    response2 = client.get("/plants/1").get_json()
+    response_body = client.get("/owners").get_json()
+
+    # Assert
+    assert response.status_code == 204
+    assert response_body == []
+    assert response2 == {
+            "id": 1,
+            "name": "Danger",
+            "description": None,
+            "photo": None,
+            "current_moisture_level": None,
+            "desired_moisture_level": 1,
+            "next_water_date": None,
+        }
+
 # test owner gets updated
+def test_update_owner(client, one_owner):
+    request_body = {
+        "last_name": "Li",
+        "email": "jamieli@gmail.com"
+    }
+    # Act
+    response = client.patch("/owners/1", json=request_body)
+    response_body = response.get_json()
+    response2 = client.get("/owners/1").get_json()
+
+    # Assert
+    assert response.status_code == 200
+    assert response_body == {
+        "id": 1,
+        "first_name": "James",
+        "last_name": "Li",
+        "email": "jamieli@gmail.com",
+        "plants": [],
+    }
+    assert response2 == {
+        "id": 1,
+        "first_name": "James",
+        "last_name": "Li",
+        "email": "jamieli@gmail.com",
+        "plants": [],
+    }
+    
 # test owner that doesn't exist raises error
