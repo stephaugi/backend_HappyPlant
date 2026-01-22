@@ -26,12 +26,6 @@ def get_one_owner(owner_id):
 
 @bp.delete("/<owner_id>")
 def delete_owner(owner_id):
-    # delete all plants from owner
-    # owner = validate_model(Owner, owner_id)
-    # for plant in owner.plants:
-    #     db.session.delete(plant)
-    # db.session.commit()
-
     # delete owner model
     return delete_model(Owner, owner_id)
 

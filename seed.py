@@ -14,11 +14,11 @@ with my_app.app_context():
 
 # from app.models.owner import Owner
 
-my_app = create_app()
-with my_app.app_context():
-    owners = [
-        Owner(first_name="James", last_name="Bond", email="jamesbond007@gmail.com"),
-        Owner(first_name="Spongebob", last_name="Squarepants", email="wholivesinapineapple@gmail.com")
-    ]
-    db.session.add_all(owners)
-    db.session.commit()
+# my_app = create_app()
+# with my_app.app_context():
+#     owners = [
+#         Owner(first_name="James", last_name="Bond", email="jamesbond007@gmail.com"),
+#         Owner(first_name="Spongebob", last_name="Squarepants", email="wholivesinapineapple@gmail.com")
+#     ]
+#     db.session.add_all(owners)
+#     db.session.commit()
