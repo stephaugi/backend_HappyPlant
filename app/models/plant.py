@@ -17,6 +17,7 @@ class Plant(db.Model):
     owner: Mapped[Optional["Owner"]] = relationship(back_populates="plants")
     water_history: Mapped[list["WaterLog"]] = relationship(back_populates="plant")
     moisture_history: Mapped[list["MoistureLog"]] = relationship(back_populates="plant")
+    plant_status: Mapped[Optional["PlantStatus"]] = relationship(back_populates="plant")
 
     def to_dict(self):
 

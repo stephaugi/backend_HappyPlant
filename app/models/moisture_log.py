@@ -1,12 +1,12 @@
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy import ForeignKey
 from typing import Optional
-from datetime import datetime
+from datetime import date
 from ..db import db
 
 class MoistureLog(db.Model):
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    time_stamp: Mapped[datetime]
+    time_stamp: Mapped[date]
     moisture_level: Mapped[int]
     plant_id: Mapped[list[int]] = mapped_column(ForeignKey("plant.id"))
     plant: Mapped[Optional["Plant"]] = relationship(back_populates="moisture_history")
@@ -15,7 +15,7 @@ class MoistureLog(db.Model):
         
         return {
             "id": self.id,
-            "time_stamp": self.name,
+            "time_stamp": str(self.time_stamp),
             "moisture_level": self.moisture_level,
             "plant_id": self.plant_id,
             "plant": self.plant.name

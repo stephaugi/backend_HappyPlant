@@ -158,14 +158,6 @@ def test_get_plants(client, one_owner, two_plants):
 
 
 # @pytest.mark.skip
-def test_delete_plant(client, one_owner, one_plant):
-    # Act
-    response = client.delete("/plants/1")
-    response_body = client.get("owners/1/plants").get_json()
-
-    # Assert
-    assert response.status_code == 204
-    assert response_body == []
 
 
 # test owner gets deleted

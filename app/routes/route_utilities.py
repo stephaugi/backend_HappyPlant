@@ -58,4 +58,4 @@ def update_model(cls, id, request_body, allowed_params):
 
     db.session.commit()
 
-    return Response(status=204, mimetype="application/json")
+    return model.to_dict(), 200

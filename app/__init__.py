@@ -1,6 +1,6 @@
 from flask import Flask
 from .db import db, migrate
-from .models import owner, plant, water_log, moisture_log
+from .models import owner, plant, water_log, moisture_log, plant_status
 from .routes.plant_routes import bp as plants_bp
 from .routes.owner_routes import bp as owners_bp
 import os
