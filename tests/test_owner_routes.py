@@ -43,18 +43,16 @@ def test_owner_to_dict_no_id():
 def test_task_from_dict():
     # Arrange
     owner_dict = dict(
-        id=1,
         first_name="James",
         last_name="Bond",
         email="jamesbond007@gmail.com",
-        plants=[],
     )
 
     # Act
     owner_obj = Owner.from_dict(owner_dict)
 
     # Assert
-    assert owner_obj.id == 1
+    assert owner_obj.id == None
     assert owner_obj.first_name == "James"
     assert owner_obj.last_name == "Bond"
     assert owner_obj.email == "jamesbond007@gmail.com"
