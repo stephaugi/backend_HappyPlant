@@ -28,7 +28,7 @@ class Owner(db.Model):
     
     @classmethod
     def from_dict(cls, owner_data):
-        params = ["id", "first_name", "last_name", "email", "plants"]
+        params = ["first_name", "last_name", "email"]
         kwarg_dict = {param: owner_data[param] for param in params}
 
         return cls(**kwarg_dict)
