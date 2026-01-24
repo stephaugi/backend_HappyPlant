@@ -58,6 +58,49 @@ def test_task_from_dict():
     assert owner_obj.email == "jamesbond007@gmail.com"
     assert owner_obj.plants == []
 
+def test_create_owner(client, one_owner, one_plant):
+
+    # Act
+    # response = client.get("/owners")
+
+    request_body = {
+            "first_name": "Spongebob",
+            "last_name": "Squarepants",
+            "email": "wholivesinapineapple@gmail.com",
+            "plants": [],
+        }
+    post_response_body = client.post("/owners", json=request_body)
+    response = client.get("/owners")
+    response_body = response.get_json()
+
+    # Assert
+    assert response.status_code == 200
+
+    assert response_body == [{
+        "id": 1,
+        "first_name": "James",
+        "last_name": "Bond",
+        "email": "jamesbond007@gmail.com",
+        "plants": [
+            {
+                "id": 1,
+                "name": "Danger",
+                "description": None,
+                "photo": None,
+                "current_moisture_level": None,
+                "desired_moisture_level": 1,
+                "next_water_date": None,
+            }
+        ],
+    },
+    {
+        "id": 2,
+        "first_name": "Spongebob",
+        "last_name": "Squarepants",
+        "email": "wholivesinapineapple@gmail.com",
+        "plants": []
+    }
+    ]
 
 def test_get_owners_one_owner(client, one_owner):
 
@@ -204,4 +247,24 @@ def test_update_owner(client, one_owner):
         "plants": [],
     }
     
-# test owner that doesn't exist raises error
+# test post request plant
+def test_create_plant(client, one_owner):
+    request_body = {
+                    "name": "Butterfly",
+                    "desired_moisture_level": 3,
+                    }
+    # Act
+    response = client.post("/owners/1/plants", json=request_body)
+    response_body = response.get_json()
+
+    # Assert
+    assert response.status_code == 201
+    assert response_body == {
+    "current_moisture_level": None,
+    "description": None,
+    "desired_moisture_level": 3,
+    "id": 1,
+    "name": "Butterfly",
+    "next_water_date": None,
+    "photo": None
+}

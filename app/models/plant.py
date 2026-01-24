@@ -33,7 +33,7 @@ class Plant(db.Model):
     
 
     @classmethod
-    def from_dict(cls, plant_data, owner_id):
+    def from_dict(cls, plant_data):
         required_params = ["name", "owner_id", "desired_moisture_level"]
         optional_params = [
             "description",
@@ -41,4 +41,7 @@ class Plant(db.Model):
             "current_moisture_level"
             ]
         kwarg_dict = {param: plant_data[param] for param in required_params}
+        for optional_param in optional_params:
+            if optional_param in plant_data:
+                kwarg_dict[optional_param] = plant_data[optional_param]
         return cls(**kwarg_dict)

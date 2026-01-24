@@ -45,6 +45,7 @@ def update_owner(owner_id):
 def create_plant(owner_id):
     request_body = request.get_json()
     request_body["owner_id"] = owner_id
+    # return request_body
     return create_model(Plant, request_body)
 
 @bp.get("/<owner_id>/plants")
