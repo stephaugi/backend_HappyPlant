@@ -5,24 +5,23 @@ from datetime import date
 from ..db import db
 
 class MoistureLog(db.Model):
+    __table_name__: "moisture_log"
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    time_stamp: Mapped[date]
-    moisture_level: Mapped[int]
-    plant_id: Mapped[list[int]] = mapped_column(ForeignKey("plant.id"))
+    timestamp: Mapped[Optional[date]]
+    moisture_level: Mapped[Optional[int]]
+    plant_id: Mapped[Optional[list[int]]] = mapped_column(ForeignKey("plant.id"))
     plant: Mapped[Optional["Plant"]] = relationship(back_populates="moisture_history")
 
     def to_dict(self):
         
         return {
             "id": self.id,
-            "time_stamp": str(self.time_stamp),
+            "timestamp": str(self.timestamp),
             "moisture_level": self.moisture_level,
-            "plant_id": self.plant_id,
-            "plant": self.plant.name
         }
 
     @classmethod
     def from_dict(cls, data):
-        required_params = ["time_stamp", "plant_id", "moisture_level"]
+        required_params = ["timestamp", "plant_id", "moisture_level"]
         kwarg_dict = {param: data[param] for param in required_params}
         return cls(**kwarg_dict)

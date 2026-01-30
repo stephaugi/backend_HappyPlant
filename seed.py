@@ -1,16 +1,17 @@
-from app import create_app, db
+# from app import create_app, db
 
-from app.models.plant import Plant
+
+# from app.models.plant import Plant
 
 # REQUIRED_PARAMS = ["name", "desired_moisture_level", "user_id"]
-my_app = create_app()
-with my_app.app_context():
-    plants = [
-        Plant(name="Jelly", desired_moisture_level=2, owner_id=2),
-        Plant(name="Danger", desired_moisture_level=1, owner_id=1),
-    ]
-    db.session.add_all(plants)
-    db.session.commit()
+# my_app = create_app()
+# with my_app.app_context():
+#     plants = [
+#         Plant(name="Jelly", desired_moisture_level=2, owner_id=2),
+#         Plant(name="Danger", desired_moisture_level=1, owner_id=1),
+#     ]
+#     db.session.add_all(plants)
+#     db.session.commit()
 
 # from app.models.owner import Owner
 
@@ -22,3 +23,17 @@ with my_app.app_context():
 #     ]
 #     db.session.add_all(owners)
 #     db.session.commit()
+
+# Owner
+# {
+#     "first_name": "James",
+#     "last_name": "Bond",
+#     "email": "bond007@gmail.com"
+# }
+
+# Plant
+# {
+#     "name": "Danger",
+#     "description": "Likes to live on the edge. It gets real dry",
+#     "desired_moisture_level": "1"
+# }

@@ -15,9 +15,8 @@ class Plant(db.Model):
     next_water_date: Mapped[Optional[datetime]] = mapped_column(default=None)
     owner_id: Mapped[Optional[int]] = mapped_column(ForeignKey("owner.id"))
     owner: Mapped[Optional["Owner"]] = relationship(back_populates="plants")
-    water_history: Mapped[list["WaterLog"]] = relationship(back_populates="plant")
-    moisture_history: Mapped[list["MoistureLog"]] = relationship(back_populates="plant")
-    plant_status: Mapped[Optional["PlantStatus"]] = relationship(back_populates="plant")
+    water_history: Mapped[Optional[list["WaterLog"]]] = relationship(back_populates="plant")
+    moisture_history: Mapped[Optional[list["MoistureLog"]]] = relationship(back_populates="plant", order_by="MoistureLog.timestamp")
 
     def to_dict(self):
 

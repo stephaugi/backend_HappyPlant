@@ -3,7 +3,6 @@ from ..db import db
 from app.models.plant import Plant
 from app.models.water_log import WaterLog
 from app.models.moisture_log import MoistureLog
-from app.models.plant_status import PlantStatus
 import datetime
 from .route_utilities import create_model, validate_model, update_model, delete_model, get_models_with_filters
 
@@ -65,28 +64,37 @@ def water_plant(plant_id):
     plant = validate_model(Plant, plant_id)
     curr_date = datetime.date.today()
     water_plant_dict = {"plant_id": plant_id,
-                        "time_stamp": curr_date}
+                        "timestamp": curr_date}
     # log number of times watered.
     # calculate average water time
     return create_model(WaterLog, water_plant_dict)
     # if len(plant.water_history) > 1:
     #     average_water_time = (len(plant.water_history)-1)
 
-@bp.post("/<plant_id>/plant_status")
-def add_plant_status(plant_id):
+@bp.post("/<plant_id>/moisture")
+def track_moisture(plant_id):
     plant = validate_model(Plant, plant_id)
-    curr_date = datetime.date.today()
+
     try:
         request_body = request.get_json()
         plant_status_dict = {"plant_id": plant_id,
-                            "time_stamp": curr_date,
+                            "timestamp": request_body["timestamp"],
                             "moisture_level": request_body["moisture_level"],
-                            "water": request_body["water"]}
+                            }
         # log number of times watered.
         # calculate average water time
-        return create_model(PlantStatus, plant_status_dict)
+        return create_model(MoistureLog, plant_status_dict)
     except:
-        required_attrs = ", ".join(["moisture_level", "water"])
+        required_attrs = ", ".join(["moisture_level", "timestamp", "plant_id"])
         response_body = {"message":
             f"Valid request body must be included. Required attrs: {required_attrs}."}
         abort(make_response(response_body, 400))
+
+@bp.get("/<plant_id>/moisture")
+def get_one_plant_moisture_logs(plant_id):
+    # params = request.args
+    plant = validate_model(Plant, plant_id)
+    moisture_logs = plant.moisture_history
+    # params = {"plant_id": plant_id}
+
+    return [moisture_log.to_dict() for moisture_log in moisture_logs]

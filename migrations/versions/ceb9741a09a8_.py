@@ -1,8 +1,8 @@
 """empty message
 
-Revision ID: e320d0708393
+Revision ID: ceb9741a09a8
 Revises: 
-Create Date: 2026-01-20 20:12:15.109391
+Create Date: 2026-01-30 02:26:32.374131
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = 'e320d0708393'
+revision = 'ceb9741a09a8'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -33,22 +33,22 @@ def upgrade():
     sa.Column('current_moisture_level', sa.Integer(), nullable=True),
     sa.Column('desired_moisture_level', sa.Integer(), nullable=False),
     sa.Column('next_water_date', sa.DateTime(), nullable=True),
-    sa.Column('owner_id', sa.Integer(), nullable=False),
+    sa.Column('owner_id', sa.Integer(), nullable=True),
     sa.ForeignKeyConstraint(['owner_id'], ['owner.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('moisture_log',
     sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
-    sa.Column('time_stamp', sa.DateTime(), nullable=False),
-    sa.Column('moisture_level', sa.Integer(), nullable=False),
-    sa.Column('plant_id', sa.Integer(), nullable=False),
+    sa.Column('timestamp', sa.Date(), nullable=True),
+    sa.Column('moisture_level', sa.Integer(), nullable=True),
+    sa.Column('plant_id', sa.Integer(), nullable=True),
     sa.ForeignKeyConstraint(['plant_id'], ['plant.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('water_log',
     sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
-    sa.Column('time_stamp', sa.DateTime(), nullable=False),
-    sa.Column('plant_id', sa.Integer(), nullable=False),
+    sa.Column('time_stamp', sa.Date(), nullable=True),
+    sa.Column('plant_id', sa.Integer(), nullable=True),
     sa.ForeignKeyConstraint(['plant_id'], ['plant.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
