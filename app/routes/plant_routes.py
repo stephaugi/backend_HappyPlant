@@ -3,8 +3,9 @@ from ..db import db
 from app.models.plant import Plant
 from app.models.water_log import WaterLog
 from app.models.moisture_log import MoistureLog
-import datetime
-from .route_utilities import create_model, validate_model, update_model, delete_model, get_models_with_filters
+from datetime import timedelta, datetime
+import math
+from .route_utilities import create_model, validate_model, validate_log, update_model, delete_model, get_models_with_filters
 
 bp = Blueprint("plants_bp", __name__, url_prefix="/plants")
 
@@ -34,14 +35,6 @@ def edit_plant(plant_id):
 
     return plant.to_dict()
 
-@bp.post("/<plant_id>/moisture_log")
-def add_moisture_log(plant_id):
-    request_body = request.get_json()
-    plant = validate_model(Plant, plant_id)
-
-    request_body["plant_id"] = plant.id
-
-    create_model(MoistureLog, request_body)
 
 @bp.delete("/<plant_id>")
 def delete_plant(plant_id):
@@ -62,14 +55,47 @@ def update_plant(plant_id):
 @bp.post("/<plant_id>/water")
 def water_plant(plant_id):
     plant = validate_model(Plant, plant_id)
-    curr_date = datetime.date.today()
-    water_plant_dict = {"plant_id": plant_id,
-                        "timestamp": curr_date}
-    # log number of times watered.
-    # calculate average water time
-    return create_model(WaterLog, water_plant_dict)
-    # if len(plant.water_history) > 1:
-    #     average_water_time = (len(plant.water_history)-1)
+    try:
+        request_body = request.get_json()
+        for request_log in request_body:
+            water_plant_dict = {"plant_id": plant_id,
+                                "timestamp": request_log["timestamp"]}
+            water_log_match = validate_log(WaterLog, request_log["timestamp"])
+            if not request_log.get("watered"):
+
+                if water_log_match:
+                    delete_model(WaterLog, water_log_match.id)
+                    
+            elif request_log.get("watered"):
+                if not water_log_match:
+                    create_model(WaterLog, water_plant_dict)
+        water_logs = plant.water_history
+        if len(water_logs) > 1:
+            # calculate water cycle length
+            total_time = 0
+            for i in range(1, len(water_logs)):
+                total_time += (water_logs[i].timestamp - water_logs[i-1].timestamp).days
+            average_water_cycle = total_time / (len(water_logs)-1)
+
+            # set water cycle length
+            plant.average_water_cycle = average_water_cycle
+            plant.next_water_date = str(water_logs[-1].timestamp + timedelta(days=average_water_cycle))
+            db.session.commit()
+            # update next moisture check reminder
+
+
+        return [water_log.to_dict() for water_log in water_logs]
+    except Exception as e:
+        # required_attrs = ", ".join(["watered", "timestamp", "plant_id"])
+        response_body = {"message": f"{e}"}            
+        abort(make_response(response_body, 400))
+
+@bp.get("/<plant_id>/water")
+def get_water_logs(plant_id):
+    plant = validate_model(Plant, plant_id)
+    water_logs = plant.water_history
+
+    return [water_log.to_dict() for water_log in water_logs]
 
 @bp.post("/<plant_id>/moisture")
 def create_moisture_logs(plant_id):
@@ -96,13 +122,21 @@ def create_moisture_logs(plant_id):
             plant_status_dict = {
                 "plant_id": plant_id,
                 "timestamp": request_log["timestamp"],
-                "moisture_level": request_log["moisture_level"],
+                "moisture_level": request_log.get("moisture_level"),
             }
-            if not request_log["id"]:
+            moisture_log_match = validate_log(MoistureLog, request_log["timestamp"])
+            if not moisture_log_match:
                 create_model(MoistureLog, plant_status_dict)
+            elif not plant_status_dict.get("moisture_level"):
+                delete_model(MoistureLog, moisture_log_match.id)
             else:
-                update_model(MoistureLog, request_log["id"], plant_status_dict, allowed_params)
+                update_model(MoistureLog, moisture_log_match.id, plant_status_dict, allowed_params)
         moisture_logs = plant.moisture_history
+        plant.current_moisture_level = moisture_logs[-1].moisture_level
+        db.session.commit()
+        if plant.current_moisture_level <= plant.desired_moisture_level:
+            # create reminder
+            return {"message":f"time to remind user. desired moisture: {plant.desired_moisture_level}. current moisture: {plant.current_moisture_level}"}, 200
         return [moisture_log.to_dict() for moisture_log in moisture_logs]
         # log number of times watered.
         # calculate average water time

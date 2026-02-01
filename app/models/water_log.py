@@ -14,7 +14,7 @@ class WaterLog(db.Model):
         return {
             "id": self.id,
             "timestamp": str(self.timestamp),
-            "plant_id": self.plant_id,
+            "watered": True,
         }
 
     @classmethod

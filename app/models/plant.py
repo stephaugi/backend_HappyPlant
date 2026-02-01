@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy import ForeignKey
 from typing import Optional
-from datetime import datetime
+from datetime import date
 from flask import abort, make_response
 from ..db import db
 
@@ -12,10 +12,11 @@ class Plant(db.Model):
     photo: Mapped[Optional[str]] = mapped_column(default=None)
     current_moisture_level: Mapped[Optional[int]] 
     desired_moisture_level: Mapped[int]
-    next_water_date: Mapped[Optional[datetime]] = mapped_column(default=None)
+    average_water_cycle: Mapped[Optional[int]]
+    next_water_date: Mapped[Optional[date]] = mapped_column(default=None)
     owner_id: Mapped[Optional[int]] = mapped_column(ForeignKey("owner.id"))
     owner: Mapped[Optional["Owner"]] = relationship(back_populates="plants")
-    water_history: Mapped[Optional[list["WaterLog"]]] = relationship(back_populates="plant")
+    water_history: Mapped[Optional[list["WaterLog"]]] = relationship(back_populates="plant", order_by="WaterLog.timestamp")
     moisture_history: Mapped[Optional[list["MoistureLog"]]] = relationship(back_populates="plant", order_by="MoistureLog.timestamp")
 
     def to_dict(self):
@@ -27,7 +28,8 @@ class Plant(db.Model):
             "photo": self.photo,
             "current_moisture_level": self.current_moisture_level,
             "desired_moisture_level": self.desired_moisture_level,
-            "next_water_date": self.next_water_date
+            "average_water_cycle": self.average_water_cycle,
+            "next_water_date": str(self.next_water_date)
             }
     
 

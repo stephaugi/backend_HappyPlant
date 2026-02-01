@@ -1,5 +1,6 @@
 from flask import abort, make_response, Response
 from ..db import db
+from datetime import datetime
 
 def get_models_with_filters(cls, filters=None):
     query = db.select(cls)
@@ -25,6 +26,20 @@ def validate_model(cls, id):
     if not model:
         response = {"message": f"{cls.__name__} {id} not found"}
         abort(make_response(response, 404))
+    
+    return model
+
+def validate_log(cls, date_string):
+    # try:
+    #     datetime.date(date_string)
+    # except:
+    #     response = {"message": f"{cls.__name__} {date_string} invalid"}
+    #     abort(make_response(response, 400))
+    # return date_string
+    query = db.select(cls).where(cls.timestamp == date_string)
+    model = db.session.scalar(query)
+    if not model:
+        return False
     
     return model
 
