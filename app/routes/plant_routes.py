@@ -72,26 +72,50 @@ def water_plant(plant_id):
     #     average_water_time = (len(plant.water_history)-1)
 
 @bp.post("/<plant_id>/moisture")
-def track_moisture(plant_id):
+def create_moisture_logs(plant_id):
     plant = validate_model(Plant, plant_id)
-
+    allowed_params = ["plant_id", "timestamp", "moisture_level"]
+    # expect to get a list of all moisture logs to create
+    # [
+    # {
+    #     "id": 1,
+    #     "moisture_level": 6,
+    #     "timestamp": "2026-01-29",
+    # },
+    # {
+    #     "id": 3,
+    #     "moisture_level": 6,
+    #     "timestamp": "2026-01-28",
+    # },
+    # ]
     try:
         request_body = request.get_json()
-        plant_status_dict = {"plant_id": plant_id,
-                            "timestamp": request_body["timestamp"],
-                            "moisture_level": request_body["moisture_level"],
-                            }
+        # response_body = []
+        for request_log in request_body:
+            plant_status_dict = {
+                "plant_id": plant_id,
+                "timestamp": request_log["timestamp"],
+                "moisture_level": request_log["moisture_level"],
+            }
+            if not request_log["id"]:
+                new_moisture_log = create_model(MoistureLog, plant_status_dict)
+                # response_body.append(new_moisture_log)
+            else:
+                moisture_log = update_model(MoistureLog, request_log["id"], plant_status_dict, allowed_params)
+                # response_body.append(moisture_log)
+        moisture_logs = plant.moisture_history
+        return [moisture_log.to_dict() for moisture_log in moisture_logs]
         # log number of times watered.
         # calculate average water time
-        return create_model(MoistureLog, plant_status_dict)
-    except:
+    except Exception as e:
         required_attrs = ", ".join(["moisture_level", "timestamp", "plant_id"])
         response_body = {"message":
-            f"Valid request body must be included. Required attrs: {required_attrs}."}
+            # f"Valid request body must be included. Required attrs: {required_attrs}."}
+            f"Error: {e}{e.args}."}
         abort(make_response(response_body, 400))
 
 @bp.get("/<plant_id>/moisture")
-def get_one_plant_moisture_logs(plant_id):
+def get_moisture_logs(plant_id):
     # params = request.args
     plant = validate_model(Plant, plant_id)
     moisture_logs = plant.moisture_history

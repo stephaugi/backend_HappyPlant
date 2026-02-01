@@ -143,3 +143,4 @@ cython_debug/
 app/routes/__pycache__/plant_routes.cpython-313.pyc
 migrations/__pycache__/env.cpython-313.pyc
 migrations/__pycache__/env.cpython-313.pyc
+migrations/__pycache__/env.cpython-313.pyc
