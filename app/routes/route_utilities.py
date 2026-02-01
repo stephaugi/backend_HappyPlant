@@ -32,7 +32,7 @@ def create_model(cls, model_data):
     try:
         new_model = cls.from_dict(model_data)
     except KeyError:
-        response_body = {"details": "Invalid data"}
+        response_body = {"details": "Invalid data. Required attrs missing."}
         abort(make_response(response_body, 400))
 
     db.session.add(new_model)

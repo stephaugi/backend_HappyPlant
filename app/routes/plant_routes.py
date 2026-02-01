@@ -90,7 +90,8 @@ def create_moisture_logs(plant_id):
     # ]
     try:
         request_body = request.get_json()
-        # response_body = []
+        if not isinstance(request_body, list):
+            raise TypeError("Request body must be a list of dictionary objects.")
         for request_log in request_body:
             plant_status_dict = {
                 "plant_id": plant_id,
@@ -98,20 +99,16 @@ def create_moisture_logs(plant_id):
                 "moisture_level": request_log["moisture_level"],
             }
             if not request_log["id"]:
-                new_moisture_log = create_model(MoistureLog, plant_status_dict)
-                # response_body.append(new_moisture_log)
+                create_model(MoistureLog, plant_status_dict)
             else:
-                moisture_log = update_model(MoistureLog, request_log["id"], plant_status_dict, allowed_params)
-                # response_body.append(moisture_log)
+                update_model(MoistureLog, request_log["id"], plant_status_dict, allowed_params)
         moisture_logs = plant.moisture_history
         return [moisture_log.to_dict() for moisture_log in moisture_logs]
         # log number of times watered.
         # calculate average water time
     except Exception as e:
         required_attrs = ", ".join(["moisture_level", "timestamp", "plant_id"])
-        response_body = {"message":
-            # f"Valid request body must be included. Required attrs: {required_attrs}."}
-            f"Error: {e}{e.args}."}
+        response_body = {"message": f"{e}"}            
         abort(make_response(response_body, 400))
 
 @bp.get("/<plant_id>/moisture")
