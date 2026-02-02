@@ -127,7 +127,7 @@ def create_moisture_logs(plant_id):
             moisture_log_match = validate_log(MoistureLog, request_log["timestamp"])
             if not moisture_log_match:
                 create_model(MoistureLog, plant_status_dict)
-            elif not plant_status_dict.get("moisture_level"):
+            elif plant_status_dict.get("moisture_level") is None:
                 delete_model(MoistureLog, moisture_log_match.id)
             else:
                 update_model(MoistureLog, moisture_log_match.id, plant_status_dict, allowed_params)
@@ -147,9 +147,18 @@ def create_moisture_logs(plant_id):
 
 @bp.get("/<plant_id>/moisture")
 def get_moisture_logs(plant_id):
-    # params = request.args
     plant = validate_model(Plant, plant_id)
     moisture_logs = plant.moisture_history
-    # params = {"plant_id": plant_id}
 
     return [moisture_log.to_dict() for moisture_log in moisture_logs]
+
+@bp.delete("/<plant_id>/clean_moisture")
+def clean_moisture_logs(plant_id):
+
+    plant = validate_model(Plant, plant_id)
+    moisture_logs = plant.moisture_history
+    for log_entry in moisture_logs:
+        if log_entry.moisture_level is None:
+            delete_model(MoistureLog, log_entry.id)
+
+    return [moisture_log.to_dict() for moisture_log in plant.moisture_history]

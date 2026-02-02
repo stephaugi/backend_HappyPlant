@@ -54,3 +54,18 @@ def get_plants(owner_id):
     
     return [plant.to_dict() for plant in owner.plants]
 
+@bp.get("/<owner_id>/moisture")
+def get_all_moisture(owner_id):
+    owner = validate_model(Owner, owner_id)
+    plants = owner.plants
+    moisture_logs = []
+
+    for plant in plants:
+        if plant.moisture_history:
+            for log in plant.moisture_history:
+                log_data = log.to_dict()
+                log_data["plant_name"] = plant.name
+                log_data["plant_id"] = plant.id
+                moisture_logs.append(log_data)
+
+    return moisture_logs, 200
