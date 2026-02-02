@@ -31,9 +31,9 @@
 #     "email": "bond007@gmail.com"
 # }
 
-Plant
-{
-    "name": "Danger",
-    "description": "Likes to live on the edge. It gets real dry",
-    "desired_moisture_level": "1"
-}
+# Plant
+# {
+#     "name": "Danger",
+#     "description": "Likes to live on the edge. It gets real dry",
+#     "desired_moisture_level": "1"
+# }
