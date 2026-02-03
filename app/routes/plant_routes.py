@@ -60,7 +60,7 @@ def water_plant(plant_id):
         for request_log in request_body:
             water_plant_dict = {"plant_id": plant_id,
                                 "timestamp": request_log["timestamp"]}
-            water_log_match = validate_log(WaterLog, request_log["timestamp"])
+            water_log_match = validate_log(WaterLog, request_log["timestamp"], plant_id)
             if not request_log.get("watered"):
 
                 if water_log_match:
@@ -124,7 +124,7 @@ def create_moisture_logs(plant_id):
                 "timestamp": request_log["timestamp"],
                 "moisture_level": request_log.get("moisture_level"),
             }
-            moisture_log_match = validate_log(MoistureLog, request_log["timestamp"])
+            moisture_log_match = validate_log(MoistureLog, request_log["timestamp"], plant_id)
             if not moisture_log_match:
                 create_model(MoistureLog, plant_status_dict)
             elif plant_status_dict.get("moisture_level") is None:

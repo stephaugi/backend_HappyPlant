@@ -29,14 +29,14 @@ def validate_model(cls, id):
     
     return model
 
-def validate_log(cls, date_string):
+def validate_log(cls, date_string, plant_id):
     # try:
     #     datetime.date(date_string)
     # except:
     #     response = {"message": f"{cls.__name__} {date_string} invalid"}
     #     abort(make_response(response, 400))
     # return date_string
-    query = db.select(cls).where(cls.timestamp == date_string)
+    query = db.select(cls).where(cls.timestamp == date_string).where(cls.plant_id == plant_id)
     model = db.session.scalar(query)
     if not model:
         return False
