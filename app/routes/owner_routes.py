@@ -69,3 +69,20 @@ def get_all_moisture(owner_id):
                 moisture_logs.append(log_data)
 
     return moisture_logs, 200
+
+
+@bp.get("/<owner_id>/water")
+def get_all_water(owner_id):
+    owner = validate_model(Owner, owner_id)
+    plants = owner.plants
+    water_logs = []
+
+    for plant in plants:
+        if plant.water_history:
+            for log in plant.water_history:
+                log_data = log.to_dict()
+                log_data["plant_name"] = plant.name
+                log_data["plant_id"] = plant.id
+                water_logs.append(log_data)
+
+    return water_logs, 200
