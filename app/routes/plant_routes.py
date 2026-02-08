@@ -126,7 +126,8 @@ def create_moisture_logs(plant_id):
             }
             moisture_log_match = validate_log(MoistureLog, request_log["timestamp"], plant_id)
             if not moisture_log_match:
-                create_model(MoistureLog, plant_status_dict)
+                if plant_status_dict.get("moisture_level") is not None:
+                    create_model(MoistureLog, plant_status_dict)
             elif plant_status_dict.get("moisture_level") is None:
                 delete_model(MoistureLog, moisture_log_match.id)
             else:
