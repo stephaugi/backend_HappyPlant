@@ -80,9 +80,11 @@ def water_plant(plant_id):
             # set water cycle length
             plant.average_water_cycle = average_water_cycle
             plant.next_water_date = str(water_logs[-1].timestamp + timedelta(days=average_water_cycle))
-            db.session.commit()
-            # update next moisture check reminder
+            
+        else:
+            plant.next_water_date = None
 
+        db.session.commit()
 
         return [water_log.to_dict() for water_log in water_logs]
     except Exception as e:
