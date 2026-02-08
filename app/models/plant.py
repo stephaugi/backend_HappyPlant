@@ -16,6 +16,7 @@ class Plant(db.Model):
     next_water_date: Mapped[Optional[date]] = mapped_column(default=None)
     owner_id: Mapped[Optional[int]] = mapped_column(ForeignKey("owner.id"))
     owner: Mapped[Optional["Owner"]] = relationship(back_populates="plants")
+    plant_species: Mapped[Optional[str]]
     water_history: Mapped[Optional[list["WaterLog"]]] = relationship(back_populates="plant", order_by="WaterLog.timestamp")
     moisture_history: Mapped[Optional[list["MoistureLog"]]] = relationship(back_populates="plant", order_by="MoistureLog.timestamp")
 
@@ -29,7 +30,8 @@ class Plant(db.Model):
             "current_moisture_level": self.current_moisture_level,
             "desired_moisture_level": self.desired_moisture_level,
             "average_water_cycle": self.average_water_cycle,
-            "next_water_date": str(self.next_water_date)
+            "next_water_date": str(self.next_water_date),
+            "plant_species": self.plant_species
             }
     
 
@@ -39,7 +41,8 @@ class Plant(db.Model):
         optional_params = [
             "description",
             "photo",
-            "current_moisture_level"
+            "current_moisture_level",
+            "plant_species"
             ]
         kwarg_dict = {param: plant_data[param] for param in required_params}
         for optional_param in optional_params:
