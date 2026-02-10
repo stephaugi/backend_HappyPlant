@@ -137,11 +137,10 @@ def create_moisture_logs(plant_id):
         moisture_logs = plant.moisture_history
         plant.current_moisture_level = moisture_logs[-1].moisture_level
         db.session.commit()
-        if plant.current_moisture_level and plant.current_moisture_level <= plant.desired_moisture_level:
-            plant.next_water_date = date.today().strftime("%Y-%m-%d")
-            db.session.commit()
-        #     # create reminder
-        #     return {"message":f"time to remind user. desired moisture: {plant.desired_moisture_level}. current moisture: {plant.current_moisture_level}"}, 200
+        if moisture_logs[-1].timestamp > plant.water_history[-1].timestamp:
+            if plant.current_moisture_level and plant.current_moisture_level <= plant.desired_moisture_level:
+                plant.next_water_date = date.today().strftime("%Y-%m-%d")
+                db.session.commit()
         return [moisture_log.to_dict() for moisture_log in moisture_logs]
         # log number of times watered.
         # calculate average water time
