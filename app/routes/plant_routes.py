@@ -42,7 +42,7 @@ def delete_plant(plant_id):
 
 @bp.patch("/<plant_id>")
 def update_plant(plant_id):
-    allowed_params = ["name", "description", "photo", "desired_moisture_level"]
+    allowed_params = ["name", "description", "photo", "desired_moisture_level", "plant_species"]
     try:
         request_body = request.get_json()
         return update_model(Plant, plant_id, request_body, allowed_params)
